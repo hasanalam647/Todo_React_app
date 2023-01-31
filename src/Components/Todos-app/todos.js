@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, Form, InputGroup } from "react-bootstrap";
 import TodosItem from "../items/Todos-Item";
 import "./todos.css";
@@ -14,8 +14,22 @@ const TodosList = () => {
     setTodoItem([...todoItem, { value, id: Date.now() }]);
     setValue("");
   };
+  const handleDelete = (id) => {
+    const todosItemIndex = todoItem.findIndex((value) => value.id === id);
+    if(todosItemIndex >= 0){
+    todoItem.splice(todosItemIndex, 1);
+    setTodoItem([...todoItem]);
+  }
+  };
 
- 
+  const  handleSave=(id, newvalue) => {
+    const todosItemIndex = todoItem.findIndex((value) => value.id === id);
+    if(todosItemIndex >= 0) {
+      todoItem.splice(todosItemIndex, 1, {value: newvalue, id});
+    setTodoItem([...todoItem])
+    }
+    
+    };
 
   return (
     <>
@@ -39,7 +53,14 @@ const TodosList = () => {
           </Button>
         </InputGroup>
         {todoItem.map((value) => (
-          <TodosItem key={value.id} todosItem={value.value} />
+          <TodosItem
+            key={value.id}
+            id={value.id}
+            todosItem={value.value}
+            handleDelete={handleDelete}
+            handleSave={handleSave}
+            
+          />
         ))}
       </Container>
     </>
