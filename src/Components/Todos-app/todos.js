@@ -1,6 +1,6 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Container, Form, InputGroup } from "react-bootstrap";
 import TodosItem from "../items/Todos-Item";
 import "./todos.css";
@@ -8,8 +8,8 @@ import "./todos.css";
 const key = "todoItems";
 
 const TodosList = () => {
-  const [value, setValue] = useState("");
   const [todoItem, setTodoItem] = useState([]);
+  const ref = useRef();
 
   useEffect(() => {
     let todoItems = JSON.parse(localStorage.getItem(key) || "[]");
@@ -22,27 +22,23 @@ const TodosList = () => {
     localStorage.setItem(key, JSON.stringify(todoItem));
   }, [todoItem]);
 
-  const handleChange = (event) => {
-    setValue(event.target.value);
-  };
   const handleAdd = (event) => {
     event.preventDefault();
 
-    if (value.length <= 0 || value.trim() === "") {
+    if (ref.current.value.length <= 0 || ref.current.value.trim() === "") {
       alert("Please Enter Valid Task");
     } else {
-      setTodoItem([...todoItem, { value, id: Date.now(), isDone: false }]);
+      setTodoItem([
+        ...todoItem,
+        { value: ref.current.value, id: Date.now(), isDone: false },
+      ]);
     }
-
-    setValue("");
+    ref.current.value = "";
   };
   const handleDone = (id) => {
     const todosItemIndex = todoItem.findIndex((value) => value.id === id);
     let todoDone = todoItem[todosItemIndex];
     todoDone.isDone = !todoDone.isDone;
-    console.log("id", id);
-    console.log("todosItemIndex", todosItemIndex);
-    console.log("todoDone", todoDone);
 
     if (todosItemIndex >= 0) {
       todoItem.splice(todosItemIndex, 1, todoDone);
@@ -79,11 +75,10 @@ const TodosList = () => {
 
         <InputGroup as="form" className="mb-3" onSubmit={handleAdd}>
           <Form.Control
+            ref={ref}
             placeholder="Please Enter Task"
             aria-label="Recipient's username"
             aria-describedby="basic-addon2"
-            value={value}
-            onChange={handleChange}
           />
           <Button variant="success" id="button-addon2" type="submit">
             <FontAwesomeIcon icon={faPlus} />
